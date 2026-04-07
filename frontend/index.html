@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DocuBase</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ─── Auth Screen ─────────────────────────────────────────────── -->
+  <div id="auth-screen" class="screen">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <span class="brand-icon">◈</span>
+        <h1 class="brand-name">DocuBase</h1>
+        <p class="brand-tagline">Write anywhere. Sync everywhere.</p>
+      </div>
+
+      <div class="auth-tabs">
+        <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">Sign In</button>
+        <button class="tab-btn" id="tab-signup" onclick="switchTab('signup')">Create Account</button>
+      </div>
+
+      <div id="auth-error" class="alert alert-error hidden"></div>
+
+      <form id="auth-form" onsubmit="handleAuth(event)">
+        <div class="field">
+          <label>Email</label>
+          <input type="email" id="auth-email" placeholder="you@example.com" required autocomplete="email" />
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input type="password" id="auth-password" placeholder="••••••••" required autocomplete="current-password" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-full" id="auth-submit">Sign In</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ─── App Shell ───────────────────────────────────────────────── -->
+  <div id="app-screen" class="screen hidden">
+
+    <!-- Sidebar -->
+    <aside id="sidebar">
+      <div class="sidebar-header">
+        <span class="brand-icon-sm">◈</span>
+        <span class="brand-name-sm">DocuBase</span>
+      </div>
+
+      <div class="sidebar-actions">
+        <button class="btn btn-new" onclick="createDocument()">+ New Document</button>
+      </div>
+
+      <nav id="doc-list" class="doc-list">
+        <!-- populated by JS -->
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-section-label">Files</div>
+        <button class="btn btn-ghost btn-sm" onclick="showFilesPanel()">↑ Upload File</button>
+        <div id="file-list" class="file-list">
+          <!-- populated by JS -->
+        </div>
+        <div class="user-row">
+          <span id="user-email-display" class="user-email"></span>
+          <button class="btn-logout" onclick="logout()" title="Sign out">⏻</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Editor -->
+    <main id="main-content">
+      <!-- Empty state -->
+      <div id="empty-state" class="empty-state">
+        <div class="empty-icon">◈</div>
+        <h2>No document open</h2>
+        <p>Select a document from the sidebar or create a new one.</p>
+        <button class="btn btn-primary" onclick="createDocument()">+ New Document</button>
+      </div>
+
+      <!-- Editor -->
+      <div id="editor-pane" class="editor-pane hidden">
+        <div class="editor-toolbar">
+          <div class="toolbar-left">
+            <input
+              type="text"
+              id="doc-title"
+              class="title-input"
+              placeholder="Untitled Document"
+              oninput="onTitleChange()"
+            />
+          </div>
+          <div class="toolbar-right">
+            <div id="sync-status" class="sync-status">Saved</div>
+            <div id="offline-badge" class="badge-offline hidden">Offline</div>
+            <div class="export-group">
+              <button class="btn btn-ghost btn-sm" onclick="exportDoc('txt')">↓ TXT</button>
+              <button class="btn btn-ghost btn-sm" onclick="exportDoc('pdf')">↓ PDF</button>
+            </div>
+            <button class="btn btn-danger-ghost btn-sm" onclick="deleteCurrentDocument()">Delete</button>
+          </div>
+        </div>
+
+        <textarea
+          id="doc-content"
+          class="editor-textarea"
+          placeholder="Start writing…"
+          oninput="onContentChange()"
+          spellcheck="true"
+        ></textarea>
+
+        <div class="editor-meta">
+          <span id="doc-updated">—</span>
+          <span id="word-count">0 words</span>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ─── File Upload Panel ───────────────────────────────────────── -->
+  <div id="file-panel" class="panel-overlay hidden">
+    <div class="panel">
+      <div class="panel-header">
+        <h3>File Manager</h3>
+        <button class="panel-close" onclick="hideFilesPanel()">✕</button>
+      </div>
+      <div class="panel-body">
+        <div class="upload-area" id="upload-area">
+          <input type="file" id="file-input" accept=".pdf,.png,.jpg,.jpeg,.gif,.webp,.txt,.md" onchange="handleFileUpload(event)" />
+          <label for="file-input" class="upload-label">
+            <span class="upload-icon">⬆</span>
+            <span>Click or drag a file here</span>
+            <span class="upload-sub">PDF, image, or text · max 20 MB</span>
+          </label>
+        </div>
+        <div id="upload-progress" class="hidden">
+          <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+          <span id="upload-status-text">Uploading…</span>
+        </div>
+        <div id="panel-file-list" class="panel-files">
+          <!-- files populated here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Toast ───────────────────────────────────────────────────── -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
